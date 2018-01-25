@@ -5,8 +5,8 @@
 
 [//]: # (Image References)
 [autonav]: ./misc/autonomous_nav.PNG
-[notebook1]: ./misc/notebook_output_1.PNG
-[notebook2]: ./misc/notebook_output_2.PNG
+[notebook1]: ./misc/notebook_output_1.png
+[notebook2]: ./misc/notebook_output_2.png
 [notebookvid]: ./misc/notebook_video.PNG
 
 ### Notebook Analysis
