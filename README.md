@@ -8,7 +8,7 @@
 
 ### Autonomous Navigation and Mapping
 [//]: # (Image References)
-[autonav]: ./misc/autonomous_nav.png
+[autonav]: ./misc/autonomous_nav.PNG
 
 ![Autonomous Navigation and Mapping Snapshot][autonav]
 
