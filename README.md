@@ -3,80 +3,61 @@
 
 ---
 
-### Notebook Analysis
-
-
-### Autonomous Navigation and Mapping
 [//]: # (Image References)
 [autonav]: ./misc/autonomous_nav.PNG
+[notebook1]: ./misc/notebook_output_1.PNG
+[notebook2]: ./misc/notebook_output_2.PNG
+[notebookvid]: ./misc/notebook_video.PNG
+
+### Notebook Analysis
+
+Below are some snapshots of the `Rover_Project_Test_Notebook.ipynb` notebook. The perception approach is discussed in the **perception.py** section below.
+
+Snapshot of notebook with provided calibration image
+![Notebook snapshot 1][notebook1]
+
+Snapshot of notebook with provided calibration image
+![Notebook snapshot 2][notebook2]
+
+Snapshot of generated video. Refer to the generated **test_mapping.mp4** file for the full video.
+![Notebook video snapshot][notebookvid]
+
+### Autonomous Navigation and Mapping
+
+#### perception.py
+The color thresholding algorithm was modified with additional input and logic to accept upper and lower thresholds. This was essential to detecting rocks.
+
+The mapping image was built using the following logic:
+
+* **Free terrain** was found by thresholding the image based on the lower threshold of **(160,160,160)**
+* **Occupied terrain** was the complement of the free terrain (or **1-freeTerrain**), except we ignored fully black pixels in the warped image. These correspond to areas outside the field of view of the rover, as the field of view is a cone but the image is a rectangle.
+* **Rocks** were found by thresholding the image with a lower threshold of **(120,100,0)** and an upper threshold of **(200,200,50)**
+* Pixels identified as rocks were also identified as free terrain
+
+Finally, logic was added to ignore a measurement if the rover roll and pitch exceeded measured thresholds. This was useful because the perception algorithm assumes that pitch and roll are zero, so values far away can lead to loss of map fidelity. 
+
+#### decision.py
+
+The "normal" navigation code was modified so the throttle is not a constant. Instead, it is scaled based on the number of nearby navigable pixels. This is done in the `proportional_throttle()` function, which:
+
+* Ignores free space pixels further than a maximum distance "max_dist" (I used 100 pixels)
+* Linearly scales the throttle between 0 and "Rover.throttle_set" using the provided thresholds for stopping ("Rover.stop_forward") and going forward ("Rover.go_forward")
+
+In addition, the steering logic was moved into a separate `steer_rover()` function. This function:
+
+* Throttles the rover with the pre-computed throttle if the steering is within limits (15 degrees)
+* Else, the throttle is set to zero (coast) and the rover is turned at its maximum rate
+
+Besides "normal" navigation, a `follow_rock()` function was added. This is used to navigate if the rover detects any pixels related to a rock observation. This function:
+
+* Steers the rover towards the rock by setting the steer angle to the mean of the angle observations
+* Slows down the rover significantly such that it approaches the rock at a slow enough speed to pick it up
+* The speed is scaled proportionally to the mean distance of all the rock pixels, so the closer it is the slower it is
+* To prevent oscillations in throttle if the rock fades in and out of sight, the rover is set to "stop" mode if a rock if observed. Therefore, it takes multiple false rock readings to start moving at full speed again
+
+Finally, logic was added at the end of the function to back up in a straight line if the pitch and roll exceed measured thresholds. This was useful for the rover to recover from driving into the sides of the cliffs or over smaller boulders.
 
 ![Autonomous Navigation and Mapping Snapshot][autonav]
 
-#### perception.py
-Modified color thresholding algorithm to take upper and lower.
-Found some rock threshold colors.
-
-#### calibration.py
-Added proportional control.
-Added rock finding algorithm
-
 ---
-
-**The goals / steps of this project are the following:**  
-
-**Training / Calibration**  
-
-* Download the simulator and take data in "Training Mode"
-* Test out the functions in the Jupyter Notebook provided
-* Add functions to detect obstacles and samples of interest (golden rocks)
-* Fill in the `process_image()` function with the appropriate image processing steps (perspective transform, color threshold etc.) to get from raw images to a map.  The `output_image` you create in this step should demonstrate that your mapping pipeline works.
-* Use `moviepy` to process the images in your saved dataset with the `process_image()` function.  Include the video you produce as part of your submission.
-
-**Autonomous Navigation / Mapping**
-
-* Fill in the `perception_step()` function within the `perception.py` script with the appropriate image processing functions to create a map and update `Rover()` data (similar to what you did with `process_image()` in the notebook). 
-* Fill in the `decision_step()` function within the `decision.py` script with conditional statements that take into consideration the outputs of the `perception_step()` in deciding how to issue throttle, brake and steering commands. 
-* Iterate on your perception and decision function until your rover does a reasonable (need to define metric) job of navigating and mapping.  
-
-[//]: # (Image References)
-
-[image1]: ./misc/rover_image.jpg
-[image2]: ./calibration_images/example_grid1.jpg
-[image3]: ./calibration_images/example_rock1.jpg 
-
-## [Rubric](https://review.udacity.com/#!/rubrics/916/view) Points
-### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
-
----
-### Writeup / README
-
-#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  
-
-You're reading it!
-
-### Notebook Analysis
-#### 1. Run the functions provided in the notebook on test images (first with the test data provided, next on data you have recorded). Add/modify functions to allow for color selection of obstacles and rock samples.
-Here is an example of how to include an image in your writeup.
-
-![alt text][image1]
-
-#### 1. Populate the `process_image()` function with the appropriate analysis steps to map pixels identifying navigable terrain, obstacles and rock samples into a worldmap.  Run `process_image()` on your test data using the `moviepy` functions provided to create video output of your result. 
-And another! 
-
-![alt text][image2]
-### Autonomous Navigation and Mapping
-
-#### 1. Fill in the `perception_step()` (at the bottom of the `perception.py` script) and `decision_step()` (in `decision.py`) functions in the autonomous mapping scripts and an explanation is provided in the writeup of how and why these functions were modified as they were.
-
-
-#### 2. Launching in autonomous mode your rover can navigate and map autonomously.  Explain your results and how you might improve them in your writeup.  
-
-**Note: running the simulator with different choices of resolution and graphics quality may produce different results, particularly on different machines!  Make a note of your simulator settings (resolution and graphics quality set on launch) and frames per second (FPS output to terminal by `drive_rover.py`) in your writeup when you submit the project so your reviewer can reproduce your results.**
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
-
-
-
-![alt text][image3]
-
 
