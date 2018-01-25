@@ -3,7 +3,22 @@
 
 ---
 
+### Notebook Analysis
 
+
+### Autonomous Navigation and Mapping
+[//]: # (Image References)
+[autonav]: ./misc/autonomous_nav.png
+
+![Autonomous Navigation and Mapping Snapshot][autonav]
+
+#### perception.py
+Modified color thresholding algorithm to take upper and lower.
+Found some rock threshold colors.
+
+#### calibration.py
+Added proportional control.
+Added rock finding algorithm
 
 ---
 
