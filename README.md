@@ -1,5 +1,6 @@
 ## Project: Search and Sample Return
-### By Sebastian Castro - 2018
+### Submission for Udacity Robotics Software Engineer Nanodegree Program
+### Sebastian Castro - 2018
 
 ---
 
